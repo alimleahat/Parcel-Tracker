@@ -4,5 +4,6 @@
 // Menu display function
 
 void showMenu();
+int getChoice();
 
 #endif
