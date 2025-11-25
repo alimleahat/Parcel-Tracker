@@ -8,6 +8,7 @@ typedef struct {
     char deliverytime[20];   // format: YYYY-MM-DD_HH:MM
     int status;               // 0 = not delivered, 1 = delivered
     float cost;
+    int courier;
 } Order;
 
 typedef struct {

@@ -6,6 +6,8 @@ int main() {
     int running = 1;
 
     while (running) {
+        printf("\033[3J\033[2J\033[1;1H"); // Clear terminal
+        
         showMenu();
         int choice = getChoice();
 
