@@ -1,50 +1,65 @@
 #include <stdio.h>
+#include <string.h>
 #include "orders.h"
 #include "common.h"
-
-// Orders: Manages adding/loading/saving/searching orders.
 
 Order orders[100];
 int orderCount = 0;
 
-void load_order() {
+void loadOrders() {
     FILE *f = fopen("data/orders.txt", "r");
     if (!f) {
-        printf("No orders file.\n");
+        printf("No orders file found.");
         return;
     }
 
     orderCount = 0;
-    while (fscanf(f, "%d %f %d",
+    while (fscanf(
+        f,
+        "%d %49s %f %19s %d %f",
         &orders[orderCount].packageID,
+        orders[orderCount].name,
         &orders[orderCount].weight,
-        &orders[orderCount].delivered) == 3)
+        orders[orderCount].deliverytime,
+        &orders[orderCount].status,
+        &orders[orderCount].cost
+    ) == 6)
     {
         orderCount++;
     }
 
     fclose(f);
-    printf("Loaded %d orders.\n", orderCount);
+    printf("Loaded %d orders.", orderCount);
 }
 
-void save_order() {
+void saveOrders() {
     FILE *f = fopen("data/orders.txt", "w");
-    if (!f) return;
+    if (!f) {
+        printf("Error saving.");
+        return;
+    }
 
     for (int i = 0; i < orderCount; i++) {
-        fprintf(f, "%d %.2f %d\n",
+        fprintf(
+            f,
+            "%d %s %.2f %s %d %.2f",
             orders[i].packageID,
+            orders[i].name,
             orders[i].weight,
-            orders[i].delivered);
+            orders[i].deliverytime,
+            orders[i].status,
+            orders[i].cost
+        );
     }
 
     fclose(f);
+    printf("Saved %d orders.", orderCount);
 }
 
-void add_order() {
-    printf("Order Added\n");
+void addOrder() {
+    printf("[addOrder Placeholder]");
 }
 
-void search_order() {
-    printf("Order Searched\n");
+void searchOrder() {
+    printf("[searchOrder Placeholder]");
 }

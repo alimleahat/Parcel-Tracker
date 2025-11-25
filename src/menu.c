@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include "menu.h"
 
-// Menu: Displays options and captures user selections.
 void showMenu() {
-    printf("\n1. View Orders\n");
+    printf("1. View Orders\n");
+    printf("2. Save Orders\n");
+    printf("3. Add Order\n");
+    printf("4. Search Order\n");
     printf("0. Exit\n");
 }
 
