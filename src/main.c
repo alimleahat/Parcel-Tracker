@@ -11,10 +11,11 @@ int main() {
 
         switch (choice) {
             case 1: loadOrders(); break;
-            case 2: saveOrders(); break;
-            case 3: addOrder(); break;
+            case 2: printf("[Order History Placeholder]"); break;
+            case 3: addOrder(); saveOrders(); break;   // auto-save
             case 4: searchOrder(); break;
-            case 0: running = 0; break;
+            case 5: printf("[Statistics Placeholder]"); break;
+            case 0: saveOrders(); running = 0; break;   // auto-save on exit
             default: printf("Invalid."); break;
         }
     }

@@ -10,4 +10,13 @@ typedef struct {
     float cost;
 } Order;
 
+typedef struct {
+    int depotID;
+    char name[50];
+    float depotDistance;   // km
+    float baseRate;        // base £
+    float ratePerKm;       // £ per km
+    float ratePerKg;       // £ per kg
+} DeliveryService;
+
 #endif
