@@ -6,6 +6,23 @@
 Order orders[100];
 int orderCount = 0;
 
+
+void orderHistoryMenu() {
+    int back = 0;
+
+    while (!back) {
+        printf("\n--- Order History Menu ---\n");
+        printf("Delivered Orders Placeholder\n");
+        printf("0. Back\n");
+
+        int choice;
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        }
+    }
+
+
 void loadOrders() {
     FILE *f = fopen("data/orders.txt", "r");
     if (!f) {

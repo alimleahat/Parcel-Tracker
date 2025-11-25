@@ -5,5 +5,6 @@ void loadOrders();
 void saveOrders();
 void addOrder();
 void searchOrder();
+void orderHistoryMenu();
 
 #endif
