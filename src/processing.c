@@ -34,3 +34,11 @@ void loadDepots() {
 void processOrder() {
     printf("[processOrder Placeholder]");
 }
+
+const char* getCourierName(int id) {
+    for (int i = 0; i < depotCount; i++) {
+        if (depots[i].depotID == id)
+            return depots[i].name;
+    }
+    return "Unknown";
+}

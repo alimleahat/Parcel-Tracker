@@ -2,24 +2,11 @@
 #include <string.h>
 #include "orders.h"
 #include "common.h"
+#include "processing.h"
 
 Order orders[100];
 int orderCount = 0;
 
-void orderHistoryMenu() {
-    int back = 0;
-
-    while (!back) {
-        printf("\n--- Order History Menu ---\n");
-        printf("Delivered Orders Placeholder\n");
-        printf("0. Back\n");
-
-        int choice;
-        printf("Enter choice: ");
-        scanf("%d", &choice);
-
-        }
-    }
 
 void loadOrders() {
     FILE *f = fopen("data/orders.txt", "r");
@@ -117,6 +104,55 @@ void addOrder() {
     }
 }
 
+void currentOrders() {
+
+    if (orderCount == 0) {
+        printf("\nNo orders found.\n");
+    } else {
+
+        printf("\n--- Current Orders ---\n");
+        printf("%-10s %-15s %-8s %-20s %-8s %-12s\n",
+                "ID", "Name", "Weight", "Delivery Time", "Cost", "Courier");
+
+        for (int i = 0; i < orderCount; i++) {
+            printf("%-10d %-15s %-8.2f %-20s %-8.2f %-12s\n",
+                   orders[i].packageID,
+                   orders[i].name,
+                   orders[i].weight,
+                   orders[i].deliverytime,
+                   orders[i].cost,
+                   getCourierName(orders[i].courier));
+        }
+    }
+
+    // Return to main menu prompt
+
+    int back = -1;
+
+    while (back != 0) {
+        printf("\nEnter 0 to return to the main menu: ");
+        scanf("%d", &back);
+        while (getchar() != '\n'); // clear buffer
+    }
+
+    // user returns to main menu after this function ends
+}
+
 void searchOrder() {
     printf("[searchOrder Placeholder]");
 }
+
+void deliveredOrders() {
+    int back = 0;
+
+    while (!back) {
+        printf("\n--- Delivered Orders ---\n");
+        printf("Delivered Orders Placeholder\n");
+        printf("0. Back\n");
+
+        int choice;
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        }
+    }

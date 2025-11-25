@@ -3,5 +3,7 @@
 
 void processOrder();
 void loadDepots();
+const char* getCourierName(int id);
+
 
 #endif

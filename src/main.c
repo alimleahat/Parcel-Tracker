@@ -1,8 +1,12 @@
 #include <stdio.h>
 #include "menu.h"
 #include "orders.h"
+#include "processing.h"
 
 int main() {
+    loadDepots();
+    loadOrders();
+    
     int running = 1;
 
     while (running) {
@@ -12,8 +16,8 @@ int main() {
         int choice = getChoice();
 
         switch (choice) {
-            case 1: loadOrders(); break;
-            case 2: orderHistoryMenu(); break;
+            case 1: currentOrders(); break;
+            case 2: deliveredOrders(); break;
             case 3: addOrder(); saveOrders(); break;   // auto-save
             case 4: searchOrder(); break;
             case 5: printf("[Statistics Placeholder]"); break;
