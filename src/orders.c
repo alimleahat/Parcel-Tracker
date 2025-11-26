@@ -45,7 +45,7 @@ void saveOrders() {
     for (int i = 0; i < orderCount; i++) {
         fprintf(
             f,
-            "%d %s %.2f %s %d %.2f %d",
+            "%d %s %.2f %s %d %.2f %d\n",
             orders[i].packageID,
             orders[i].name,
             orders[i].weight,
@@ -142,17 +142,70 @@ void searchOrder() {
     printf("[searchOrder Placeholder]");
 }
 
+void syncDeliveredOrders() {
+
+    // Append delivered orders to delivered.txt
+    FILE *f = fopen("data/history.txt", "a");
+    if (!f) {
+        printf("Error opening delivered file.\n");
+        return;
+    }
+
+    for (int i = 0; i < orderCount; i++) {
+        if (orders[i].status == 1) {
+
+            // Write to delivered.txt
+            fprintf(f, "%d %s %.2f %s %d %.2f %d\n",
+                orders[i].packageID,
+                orders[i].name,
+                orders[i].weight,
+                orders[i].deliverytime,
+                orders[i].status,
+                orders[i].cost,
+                orders[i].courier
+            );
+        }
+    }
+
+    fclose(f);
+
+    // Remove delivered orders from active list
+    int j = 0;
+    for (int i = 0; i < orderCount; i++) {
+        if (orders[i].status == 0) {
+            orders[j++] = orders[i];
+        }
+    }
+
+    orderCount = j;
+    saveOrders();     // rewrite orders.txt with only active orders
+}
+
 void deliveredOrders() {
+
+    // Automatically move delivered items from orders[] to delivered.txt
+    syncDeliveredOrders();
+
     int back = 0;
 
     while (!back) {
-        printf("\n--- Delivered Orders ---\n");
-        printf("Delivered Orders Placeholder\n");
+        printf("\n--- Delivered Orders Menu ---\n");
+        printf("1. View Delivered Orders\n");
         printf("0. Back\n");
 
-        int choice;
+        int c;
         printf("Enter choice: ");
-        scanf("%d", &choice);
+        scanf("%d", &c);
+        while (getchar() != '\n');
 
+        if (c == 1) {
+            deliveredOrders();
+        }
+        else if (c == 0) {
+            back = 1;
+        }
+        else {
+            printf("Invalid.\n");
         }
     }
+}

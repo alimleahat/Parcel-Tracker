@@ -7,5 +7,6 @@ void addOrder();
 void searchOrder();
 void deliveredOrders();
 void currentOrders();
+void syncDeliveredOrders();
 
 #endif
