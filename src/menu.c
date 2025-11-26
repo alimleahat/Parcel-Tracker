@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "menu.h"
+#include "processing.h"
 
 void showMenu() {
     printf("\n\n1. Current Orders\n");
@@ -8,6 +9,8 @@ void showMenu() {
     printf("4. Search Order\n");
     printf("5. Statistics\n");
     printf("0. Exit\n");
+    printf("Current time: %s\n", getCurrentTimestamp());
+
 }
 
 int getChoice() {
