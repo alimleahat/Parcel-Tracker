@@ -59,6 +59,7 @@ void saveOrders() {
     fclose(f);
 }
 
+
 void addOrder() {
     int again = 1;
 
@@ -139,8 +140,84 @@ void currentOrders() {
 }
 
 void searchOrder() {
-    printf("[searchOrder Placeholder]");
+    int id;
+    printf("Enter Package ID to search: ");
+    scanf("%d", &id);
+    while (getchar() != '\n');
+
+    int found = 0;
+
+    // 1. Search ACTIVE orders (in memory)
+
+    for (int i = 0; i < orderCount; i++) {
+        if (orders[i].packageID == id) {
+            found = 1;
+
+            printf("\n--- Order Found ---\n");
+            printf("%-10s %-15s %-8s %-20s %-15s %-8s %-12s\n",
+                   "ID", "Name", "Weight", "Delivery Time",
+                   "Status", "Cost", "Courier");
+
+            printf("%-10d %-15s %-8.2f %-20s %-15s %-8.2f %-12s\n",
+                   orders[i].packageID,
+                   orders[i].name,
+                   orders[i].weight,
+                   orders[i].deliverytime,
+                   "NOT DELIVERED",
+                   orders[i].cost,
+                   getCourierName(orders[i].courier));
+
+            goto endSearch;
+        }
+    }
+
+    // 2. Search DELIVERED orders (delivered.txt)
+
+    FILE *f = fopen("data/history.txt", "r");
+    if (f) {
+        int id2, courier;
+        char name[50], time[20];
+        float weight, cost;
+
+        while (fscanf(f, "%d %49s %f %19s %f %d",
+                      &id2, name, &weight, time,
+                      &cost, &courier) == 6)
+        {
+            if (id2 == id) {
+                found = 1;
+
+                printf("\n--- Order Found ---\n");
+                printf("%-10s %-15s %-8s %-20s %-15s %-8s %-12s\n",
+                       "ID", "Name", "Weight", "Delivery Time",
+                       "Status", "Cost", "Courier");
+
+                printf("%-10d %-15s %-8.2f %-20s %-15s %-8.2f %-12s\n",
+                       id2, name, weight, time,
+                       "DELIVERED",
+                       cost,
+                       getCourierName(courier));
+
+                fclose(f);
+                goto endSearch;
+            }
+        }
+
+        fclose(f);
+    }
+
+endSearch:
+    if (!found) {
+        printf("\nNo order with ID %d found.\n", id);
+    }
+
+    int back = -1;
+    while (back != 0) {
+        printf("\nEnter 0 to return to main menu: ");
+        scanf("%d", &back);
+        while (getchar() != '\n');
+    }
 }
+
 
 void syncDeliveredOrders() {
 
@@ -178,34 +255,45 @@ void syncDeliveredOrders() {
     }
 
     orderCount = j;
-    saveOrders();     // rewrite orders.txt with only active orders
+    saveOrders(); // rewrite orders.txt with only active orders
 }
 
 void deliveredOrders() {
 
-    // Automatically move delivered items from orders[] to delivered.txt
+    // Step 1: Auto-sync delivered orders
     syncDeliveredOrders();
 
-    int back = 0;
+    // Step 2: Open delivered.txt and display everything
+    FILE *f = fopen("data/history.txt", "r");
+    if (!f) {
+        printf("No delivered orders found.\n");
+    } else {
 
-    while (!back) {
-        printf("\n--- Delivered Orders Menu ---\n");
-        printf("1. View Delivered Orders\n");
-        printf("0. Back\n");
+        printf("\n--- Delivered Orders ---\n");
+        printf("%-10s %-15s %-8s %-20s %-8s %-12s\n",
+               "ID", "Name", "Weight", "Delivery Time", "Cost", "Courier");
 
-        int c;
-        printf("Enter choice: ");
-        scanf("%d", &c);
-        while (getchar() != '\n');
+        int id, courier, status;
+        char name[50], time[20];
+        float weight, cost;
 
-        if (c == 1) {
-            deliveredOrders();
+        // Read each delivered entry
+        while (fscanf(f, "%d %49s %f %19s %d %f %d",
+                      &id, name, &weight, time, &status, &cost, &courier) == 7)
+        {
+            printf("%-10d %-15s %-8.2f %-20s %-8.2f %-12s\n",
+                   id, name, weight, time, cost, getCourierName(courier));
         }
-        else if (c == 0) {
-            back = 1;
-        }
-        else {
-            printf("Invalid.\n");
-        }
+
+        fclose(f);
+    }
+
+    // Step 3: Pause and return
+    int back = -1;
+    while (back != 0) {
+        printf("\nEnter 0 to return to main menu: ");
+        scanf("%d", &back);
+        while (getchar() != '\n');  // Clear buffer
     }
 }
+

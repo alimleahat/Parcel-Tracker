@@ -8,5 +8,6 @@ void searchOrder();
 void deliveredOrders();
 void currentOrders();
 void syncDeliveredOrders();
+void saveDelivered();
 
 #endif
