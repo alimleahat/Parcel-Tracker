@@ -74,9 +74,28 @@ void addOrder() {
         scanf("%d", &o.packageID);
         while (getchar() != '\n');
 
-        printf("Enter delivery time (YYYY-MM-DD_HH:MM): ");
-        scanf("%19s", o.deliverytime);
+            // ---- DELIVERY DATE ----
+        int day, month, year, hour, minute;
+
+        printf("Enter delivery date (DD/MM/YYYY): ");
+        scanf("%d/%d/%d", &day, &month, &year);
         while (getchar() != '\n');
+
+        printf("Enter delivery time (HH:MM): ");
+        scanf("%d:%d", &hour, &minute);
+        while (getchar() != '\n');
+
+        // ---- OPTIONAL VALIDATION ----
+        if (day < 1 || day > 31 || month < 1 || month > 12 || year < 2025 ||
+            hour < 0 || hour > 23 || minute < 0 || minute > 59) {
+            printf("Invalid date or time. Please try again.\n");
+            continue;   // restarts add-order loop
+        }
+
+        // ---- INTERNAL STORAGE FORMAT ----
+        sprintf(o.deliverytime, "%04d-%02d-%02d_%02d:%02d",
+                year, month, day, hour, minute);
+
 
         printf("Enter weight (kg): ");
         scanf("%f", &o.weight);
@@ -114,30 +133,41 @@ void currentOrders() {
 
         printf("\n--- Current Orders ---\n");
         printf("%-10s %-15s %-8s %-20s %-8s %-12s\n",
-                "ID", "Name", "Weight", "Delivery Time", "Cost", "Courier");
+               "ID", "Name", "Weight", "Delivery in", "Cost", "Courier");
 
         for (int i = 0; i < orderCount; i++) {
+
+            char timeLeft[50];
+            int newStatus;
+
+            // Calculate time remaining AND check if delivered
+            getTimeRemaining(orders[i].deliverytime, timeLeft, &newStatus);
+
+            // Auto-update status (0 → 1 when delivery time passes)
+            if (newStatus == 1 && orders[i].status == 0) {
+                orders[i].status = 1;
+            }
+
             printf("%-10d %-15s %-8.2f %-20s %-8.2f %-12s\n",
                    orders[i].packageID,
                    orders[i].name,
                    orders[i].weight,
-                   orders[i].deliverytime,
+                   timeLeft,
                    orders[i].cost,
                    getCourierName(orders[i].courier));
         }
     }
 
+    // Save updated statuses (important!)
+    saveOrders();
+
     // Return to main menu prompt
-
     int back = -1;
-
     while (back != 0) {
         printf("\nEnter 0 to return to the main menu: ");
         scanf("%d", &back);
-        while (getchar() != '\n'); // clear buffer
+        while (getchar() != '\n');
     }
-
-    // user returns to main menu after this function ends
 }
 
 void searchOrder() {
@@ -264,26 +294,35 @@ void deliveredOrders() {
     // Step 1: Auto-sync delivered orders
     syncDeliveredOrders();
 
-    // Step 2: Open delivered.txt and display everything
+    // Step 2: Open history.txt and display everything
     FILE *f = fopen("data/history.txt", "r");
     if (!f) {
-        printf("No delivered orders found.\n");
+        printf("\nNo delivered orders found.\n");
     } else {
 
         printf("\n--- Delivered Orders ---\n");
-        printf("%-10s %-15s %-8s %-20s %-8s %-12s\n",
-               "ID", "Name", "Weight", "Delivery Time", "Cost", "Courier");
+        printf("%-10s %-15s %-8s %-25s %-8s %-12s\n",
+               "ID", "Name", "Weight", "Delivered", "Cost", "Courier");
 
         int id, courier, status;
-        char name[50], time[20];
+        char name[50], timeStr[20];
         float weight, cost;
 
         // Read each delivered entry
         while (fscanf(f, "%d %49s %f %19s %d %f %d",
-                      &id, name, &weight, time, &status, &cost, &courier) == 7)
+                      &id, name, &weight, timeStr, &status, &cost, &courier) == 7)
         {
-            printf("%-10d %-15s %-8.2f %-20s %-8.2f %-12s\n",
-                   id, name, weight, time, cost, getCourierName(courier));
+            // NEW: Calculate how long ago it was delivered
+            char ago[50];
+            getTimeSinceDelivery(timeStr, ago);
+
+            printf("%-10d %-15s %-8.2f %-25s %-8.2f %-12s\n",
+                   id,
+                   name,
+                   weight,
+                   ago,                   // ← REPLACES the raw timestamp
+                   cost,
+                   getCourierName(courier));
         }
 
         fclose(f);
@@ -297,4 +336,5 @@ void deliveredOrders() {
         while (getchar() != '\n');  // Clear buffer
     }
 }
+
 

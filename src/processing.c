@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "processing.h"
 #include "common.h"
 #include <time.h>
@@ -76,3 +77,76 @@ char* getCurrentTimestamp() {
     return buffer;
 }
 
+void parseDeliveryTime(const char *deliveryStr, struct tm *t) {
+    // Example format: 2025-11-28_14:30
+    sscanf(deliveryStr, "%d-%d-%d_%d:%d",
+           &t->tm_year,
+           &t->tm_mon,
+           &t->tm_mday,
+           &t->tm_hour,
+           &t->tm_min);
+
+    t->tm_year -= 1900;   // tm_year is years since 1900
+    t->tm_mon -= 1;       // tm_mon is 0–11
+    t->tm_sec = 0;
+    t->tm_isdst = -1;     // let system determine
+}
+
+void getTimeRemaining(const char *deliveryStr, char *output, int *status) {
+    time_t now = time(NULL);
+    struct tm delivery = {0};
+
+    parseDeliveryTime(deliveryStr, &delivery);
+
+    time_t deliveryTime = mktime(&delivery);
+
+    double diff = difftime(deliveryTime, now);
+
+    if (diff <= 0) {
+        // Delivery time has passed
+        strcpy(output, "Delivered");
+        *status = 1;   // mark delivered
+        return;
+    }
+
+    int seconds = diff;
+    int days = seconds / 86400;
+    seconds %= 86400;
+    int hours = seconds / 3600;
+
+    if (days == 0 && hours < 1) {
+        strcpy(output, "Less than an hour");
+    } else {
+        sprintf(output, "%d days %d hours", days, hours);
+    }
+
+    *status = 0;
+}
+
+void getTimeSinceDelivery(const char *deliveryStr, char *output) {
+    time_t now = time(NULL);
+    struct tm delivery = {0};
+
+    parseDeliveryTime(deliveryStr, &delivery);
+
+    time_t deliveryTime = mktime(&delivery);
+
+    double diff = difftime(now, deliveryTime);
+
+    if (diff < 0) {
+        // delivery time in the future (should never happen here)
+        strcpy(output, "Not delivered");
+        return;
+    }
+
+    int seconds = (int)diff;
+    int days = seconds / 86400;
+    seconds %= 86400;
+    int hours = seconds / 3600;
+
+    if (days == 0 && hours < 1) {
+        strcpy(output, "Less than an hour ago");
+    } else {
+        sprintf(output, "%d days %d hours ago", days, hours);
+    }
+}
