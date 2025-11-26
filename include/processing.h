@@ -4,6 +4,7 @@
 void processOrder();
 void loadDepots();
 const char* getCourierName(int id);
+float calculateCost(float weight, int courierID);
 
 
 #endif

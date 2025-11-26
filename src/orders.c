@@ -87,7 +87,8 @@ void addOrder() {
         while (getchar() != '\n');
 
         o.status = 0;
-        o.cost = 0.0f;
+        o.cost = calculateCost(o.weight, o.courier);
+        printf("\nCalculated Cost: £%.2f\n", o.cost);
 
         orders[orderCount++] = o;
 

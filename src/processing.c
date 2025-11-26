@@ -42,3 +42,18 @@ const char* getCourierName(int id) {
     }
     return "Unknown";
 }
+
+float calculateCost(float weight, int courierID) {
+    for (int i = 0; i < depotCount; i++) {
+        if (depots[i].depotID == courierID) {
+
+            float base = depots[i].baseRate;
+            float distanceCost = depots[i].depotDistance * depots[i].ratePerKm;
+            float weightCost = weight * depots[i].ratePerKg;
+
+            return base + distanceCost + weightCost;
+        }
+    }
+
+    return 0.0f;  // fallback
+}
