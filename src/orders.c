@@ -206,13 +206,13 @@ void searchOrder() {
 
     FILE *f = fopen("data/history.txt", "r");
     if (f) {
-        int id2, courier;
+        int id2, courier, status;
         char name[50], time[20];
         float weight, cost;
 
-        while (fscanf(f, "%d %49s %f %19s %f %d",
-                      &id2, name, &weight, time,
-                      &cost, &courier) == 6)
+        while (fscanf(f, "%d %49s %f %19s %d %f %d",
+                  &id2, name, &weight, time,
+                  &status, &cost, &courier) == 7)
         {
             if (id2 == id) {
                 found = 1;
