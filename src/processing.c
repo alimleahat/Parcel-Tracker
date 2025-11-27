@@ -3,6 +3,7 @@
 #include "processing.h"
 #include "common.h"
 #include <time.h>
+#include "orders.h"
 
 DeliveryService depots[20];
 int depotCount = 0;

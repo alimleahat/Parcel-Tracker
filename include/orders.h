@@ -11,5 +11,9 @@ void syncDeliveredOrders();
 void saveDelivered();
 void sortCurrentOrdersByDeliveryTime();
 void sortDeliveredItems();
+void statisticsMenu();
+void showBasicStats();
+void showCourierBarChart();
+
 
 #endif

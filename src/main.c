@@ -20,7 +20,7 @@ int main() {
             case 2: deliveredOrders(); break;
             case 3: addOrder(); saveOrders(); break;   // auto-save
             case 4: searchOrder(); break;
-            case 5: printf("[Statistics Placeholder]"); break;
+            case 5: statisticsMenu(); break;
             case 0: saveOrders(); running = 0; break;   // auto-save on exit
             default: printf("Invalid."); break;
         }
