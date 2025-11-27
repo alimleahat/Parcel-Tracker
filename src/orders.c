@@ -107,13 +107,10 @@ void addOrder() {
         sprintf(o.deliverytime, "%04d-%02d-%02d_%02d:%02d",
                 year, month, day, hour, minute);
 
-
-        printf("Enter weight (kg): ");
-        scanf("%f", &o.weight);
+        o.weight = getIntInRange("Enter weight (kg): ", 0, 999);
         while (getchar() != '\n');
 
-        printf("1.FadEx\n2.USP\n3.DLH\n4.Royal Mile\n5.PDP\nSelect courier (1-5): ");
-        scanf("%d", &o.courier);
+        o.courier = getIntInRange("1.FadEx\n2.USP\n3.DLH\n4.Royal Mile\n5.PDP\nSelect courier (1-5): ", 1, 5);
         while (getchar() != '\n');
 
         o.status = 0;
@@ -127,7 +124,8 @@ void addOrder() {
         printf("0. Return to main menu\n");
         printf("Enter choice: ");
 
-        scanf("%d", &again);
+        
+        again = getIntInRange("Enter choice: ", 0, 1);
         while (getchar() != '\n');
 
         if (again != 1) {
@@ -177,13 +175,9 @@ void currentOrders() {
         }
     }
 
-    // normal return
-    int back = -1;
-    while (back != 0) {
-        printf("\nEnter 0 to return to the main menu: ");
-        scanf("%d", &back);
-        while (getchar() != '\n');
-    }
+
+    getIntInRange("\nEnter 0 to return: ", 0, 0);
+    return;
 }
 
 void searchOrder() {
@@ -287,12 +281,8 @@ endSearch:
         printf("\nNo order with ID %d found.\n", id);
     }
 
-    int back = -1;
-    while (back != 0) {
-        printf("\nEnter 0 to return to main menu: ");
-        scanf("%d", &back);
-        while (getchar() != '\n');
-    }
+    getIntInRange("\nEnter 0 to return: ", 0, 0);
+    return;
 }
 
 void syncDeliveredOrders() {
@@ -391,14 +381,10 @@ void deliveredOrders() {
         }
 
     int sortChoice;
-    printf("\nEnter 1 to sort by most recent delivery\n");
-    printf("Enter 0 to return to main menu: ");
 
-    scanf("%d", &sortChoice);
-    while (getchar() != '\n');
+    sortChoice = getIntInRange("Press 1 to sort by delivery time or 0 to return: ", 0, 1);
 
     if (sortChoice == 0) {
-        // 🔥 FIX: Exit immediately without asking again
         return;
     }
 
@@ -430,13 +416,8 @@ void deliveredOrders() {
         }
     }
 
-    // 🔥 Now this exit loop only runs AFTER sorting
-    int back = -1;
-    while (back != 0) {
-        printf("\nEnter 0 to return to main menu: ");
-        scanf("%d", &back);
-        while (getchar() != '\n');
-        }
+    getIntInRange("\nEnter 0 to return: ", 0, 0);
+    return;
     }
 }
 
@@ -495,10 +476,8 @@ void statisticsMenu() {
         printf("   0) Back\n\n");
 
         printf("──────────────────────────────────────────\n");
-        printf("👉 Enter choice: ");
 
-        scanf("%d", &choice);
-        while (getchar() != '\n');
+        choice = getIntInRange("Enter choice: ", 0, 2);
 
         if (choice == 1) {
             showBasicStats();
@@ -562,12 +541,8 @@ void showBasicStats() {
 
     printf("\n──────────────────────────────────────────────\n\n");
 
-    int back = -1;
-    while (back != 0) {
-        printf("\nEnter 0 to go back: ");
-        scanf("%d", &back);
-        while (getchar() != '\n');
-    }
+    getIntInRange("\nEnter 0 to return: ", 0, 0);
+    return;
 }
 void showCourierBarChart() {
 
@@ -618,10 +593,6 @@ void showCourierBarChart() {
 
     printf("\n──────────────────────────────────────────────\n");
 
-    int back = -1;
-    while (back != 0) {
-        printf("Enter 0 to return: ");
-        scanf("%d", &back);
-        while (getchar() != '\n');  // flush
-    }
+    getIntInRange("\nEnter 0 to return: ", 0, 0);
+    return;
 }

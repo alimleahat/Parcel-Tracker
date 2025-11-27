@@ -31,7 +31,6 @@ void showMenu() {
 
 int getChoice() {
     int c;
-    printf("👉 Enter choice: ");
-    scanf("%d", &c);
+    c = getIntInRange("👉 Enter choice (0–5): ", 0, 5);
     return c;
 }

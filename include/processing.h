@@ -11,6 +11,7 @@ void parseDeliveryTime(const char *deliveryStr, struct tm *t);
 void getTimeRemaining(const char *deliveryStr, char *output, int *status);
 void getTimeSinceDelivery(const char *deliveryStr, char *output);
 time_t convertToTimestamp(const char *deliveryStr);
+int getIntInRange(const char *prompt, int min, int max);
 
 
 #endif

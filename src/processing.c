@@ -152,3 +152,26 @@ time_t convertToTimestamp(const char *deliveryStr) {
     parseDeliveryTime(deliveryStr, &t);
     return mktime(&t);
 }
+
+int getIntInRange(const char *prompt, int min, int max) {
+    int value;
+    int valid = 0;
+
+    while (!valid) {
+        printf("%s", prompt);
+
+        if (scanf("%d", &value) == 1) {
+            if (value >= min && value <= max) {
+                valid = 1;   // VALID input
+            } else {
+                printf("Input must be between %d and %d.\n", min, max);
+            }
+        } else {
+            printf("Invalid input. Please enter a number.\n");
+        }
+
+        while (getchar() != '\n'); // CLEAR buffer
+    }
+
+    return value;
+}
