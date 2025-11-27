@@ -13,7 +13,7 @@ int main() {
         printf("\033[3J\033[2J\033[1;1H"); // Clear terminal
         
         showMenu();
-        int choice = getChoice();
+        int choice = getIntInRange("Enter choice (0–5): ", 0, 5);
 
         switch (choice) {
             case 1: currentOrders(); break;

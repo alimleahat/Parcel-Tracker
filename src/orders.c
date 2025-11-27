@@ -7,17 +7,6 @@
 
 Order orders[100];
 int orderCount = 0;
-typedef struct {
-    int id;
-    char name[50];
-    float weight;
-    char timeStr[20];
-    float cost;
-    int courier;
-    int status;
-} DeliveredItem;
-
-
 
 void loadOrders() {
     FILE *f = fopen("data/orders.txt", "r");
@@ -43,7 +32,6 @@ void loadOrders() {
     }
 
     fclose(f);
-    printf("Loaded %d orders.", orderCount);
 }
 
 void saveOrders() {
