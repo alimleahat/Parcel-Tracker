@@ -178,23 +178,36 @@ void searchOrder() {
 
     int found = 0;
 
+    // ------------------------------------
     // 1. Search ACTIVE orders (in memory)
-
+    // ------------------------------------
     for (int i = 0; i < orderCount; i++) {
         if (orders[i].packageID == id) {
+
             found = 1;
 
-            printf("\n--- Order Found ---\n");
-            printf("%-10s %-15s %-8s %-20s %-15s %-8s %-12s\n",
-                   "ID", "Name", "Weight", "Delivery Time",
-                   "Status", "Cost", "Courier");
+            char timeLeft[50];
+            int newStatus;
 
-            printf("%-10d %-15s %-8.2f %-20s %-15s %-8.2f %-12s\n",
+            // Calculate remaining time
+            getTimeRemaining(orders[i].deliverytime, timeLeft, &newStatus);
+
+            // Auto-update status if overdue
+            if (newStatus == 1 && orders[i].status == 0) {
+                orders[i].status = 1;
+                saveOrders();
+            }
+
+            printf("\n--- Order Found ---\n");
+            printf("%-10s %-15s %-8s %-25s %-8s %-12s\n",
+                   "ID", "Name", "Weight", "Time Left",
+                   "Cost", "Courier");
+
+            printf("%-10d %-15s %-8.2f %-25s %-8.2f %-12s\n",
                    orders[i].packageID,
                    orders[i].name,
                    orders[i].weight,
-                   orders[i].deliverytime,
-                   "NOT DELIVERED",
+                   timeLeft,                     // ✔ No status shown
                    orders[i].cost,
                    getCourierName(orders[i].courier));
 
@@ -202,29 +215,38 @@ void searchOrder() {
         }
     }
 
-    // 2. Search DELIVERED orders (delivered.txt)
 
+    // ------------------------------------
+    // 2. Search DELIVERED orders (history)
+    // ------------------------------------
     FILE *f = fopen("data/history.txt", "r");
     if (f) {
         int id2, courier, status;
-        char name[50], time[20];
+        char name[50], timeStr[20];
         float weight, cost;
 
         while (fscanf(f, "%d %49s %f %19s %d %f %d",
-                  &id2, name, &weight, time,
-                  &status, &cost, &courier) == 7)
+                      &id2, name, &weight, timeStr,
+                      &status, &cost, &courier) == 7)
         {
             if (id2 == id) {
+
                 found = 1;
 
-                printf("\n--- Order Found ---\n");
-                printf("%-10s %-15s %-8s %-20s %-15s %-8s %-12s\n",
-                       "ID", "Name", "Weight", "Delivery Time",
-                       "Status", "Cost", "Courier");
+                // Calculate "delivered X days ago"
+                char ago[50];
+                getTimeSinceDelivery(timeStr, ago);
 
-                printf("%-10d %-15s %-8.2f %-20s %-15s %-8.2f %-12s\n",
-                       id2, name, weight, time,
-                       "DELIVERED",
+                printf("\n--- Order Found ---\n");
+                printf("%-10s %-15s %-8s %-25s %-8s %-12s\n",
+                       "ID", "Name", "Weight", "Delivered",
+                       "Cost", "Courier");
+
+                printf("%-10d %-15s %-8.2f %-25s %-8.2f %-12s\n",
+                       id2,
+                       name,
+                       weight,
+                       ago,                    // ✔ New field
                        cost,
                        getCourierName(courier));
 
@@ -235,6 +257,7 @@ void searchOrder() {
 
         fclose(f);
     }
+
 
 endSearch:
     if (!found) {
@@ -248,7 +271,6 @@ endSearch:
         while (getchar() != '\n');
     }
 }
-
 
 void syncDeliveredOrders() {
 
