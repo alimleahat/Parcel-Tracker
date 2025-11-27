@@ -6,6 +6,16 @@
 
 Order orders[100];
 int orderCount = 0;
+typedef struct {
+    int id;
+    char name[50];
+    float weight;
+    char timeStr[20];
+    float cost;
+    int courier;
+    int status;
+} DeliveredItem;
+
 
 
 void loadOrders() {
@@ -132,18 +142,28 @@ void currentOrders() {
     } else {
 
         printf("\n--- Current Orders ---\n");
+        printf("Press 1 to sort by nearest delivery time.\n");
+
+        int choice;
+        printf("Enter choice (or 0 to continue): ");
+        scanf("%d", &choice);
+        while (getchar() != '\n');
+
+        if (choice == 1) {
+            sortCurrentOrdersByDeliveryTime();
+            printf("\nSorted by delivery time.\n");
+        }
+
         printf("%-10s %-15s %-8s %-20s %-8s %-12s\n",
-               "ID", "Name", "Weight", "Delivery in", "Cost", "Courier");
+               "ID", "Name", "Weight", "Time Left", "Cost", "Courier");
 
         for (int i = 0; i < orderCount; i++) {
 
             char timeLeft[50];
             int newStatus;
 
-            // Calculate time remaining AND check if delivered
             getTimeRemaining(orders[i].deliverytime, timeLeft, &newStatus);
 
-            // Auto-update status (0 → 1 when delivery time passes)
             if (newStatus == 1 && orders[i].status == 0) {
                 orders[i].status = 1;
             }
@@ -158,10 +178,8 @@ void currentOrders() {
         }
     }
 
-    // Save updated statuses (important!)
     saveOrders();
 
-    // Return to main menu prompt
     int back = -1;
     while (back != 0) {
         printf("\nEnter 0 to return to the main menu: ");
@@ -313,50 +331,103 @@ void syncDeliveredOrders() {
 
 void deliveredOrders() {
 
-    // Step 1: Auto-sync delivered orders
     syncDeliveredOrders();
 
-    // Step 2: Open history.txt and display everything
     FILE *f = fopen("data/history.txt", "r");
     if (!f) {
         printf("\nNo delivered orders found.\n");
     } else {
 
         printf("\n--- Delivered Orders ---\n");
-        printf("%-10s %-15s %-8s %-25s %-8s %-12s\n",
-               "ID", "Name", "Weight", "Delivered", "Cost", "Courier");
+        printf("Press 1 to sort by most recent delivery.\n");
+
+        int choice;
+        printf("Enter choice (or 0 to continue): ");
+        scanf("%d", &choice);
+        while (getchar() != '\n');
+
+        DeliveredItem arr[200];
+        int count = 0;
 
         int id, courier, status;
         char name[50], timeStr[20];
         float weight, cost;
 
-        // Read each delivered entry
         while (fscanf(f, "%d %49s %f %19s %d %f %d",
                       &id, name, &weight, timeStr, &status, &cost, &courier) == 7)
         {
-            // NEW: Calculate how long ago it was delivered
-            char ago[50];
-            getTimeSinceDelivery(timeStr, ago);
+            arr[count].id = id;
+            strcpy(arr[count].name, name);
+            arr[count].weight = weight;
+            strcpy(arr[count].timeStr, timeStr);
+            arr[count].cost = cost;
+            arr[count].courier = courier;
+            arr[count].status = status;
+            count++;
+        }
+        fclose(f);
 
-            printf("%-10d %-15s %-8.2f %-25s %-8.2f %-12s\n",
-                   id,
-                   name,
-                   weight,
-                   ago,                   // ← REPLACES the raw timestamp
-                   cost,
-                   getCourierName(courier));
+        if (choice == 1) {
+            sortDeliveredItems(arr, count);
+            printf("\nSorted by latest deliveries first.\n");
         }
 
-        fclose(f);
+        printf("%-10s %-15s %-8s %-25s %-8s %-12s\n",
+               "ID", "Name", "Weight", "Delivered", "Cost", "Courier");
+
+        for (int i = 0; i < count; i++) {
+            char ago[50];
+            getTimeSinceDelivery(arr[i].timeStr, ago);
+
+            printf("%-10d %-15s %-8.2f %-25s %-8.2f %-12s\n",
+                   arr[i].id,
+                   arr[i].name,
+                   arr[i].weight,
+                   ago,
+                   arr[i].cost,
+                   getCourierName(arr[i].courier));
+        }
     }
 
-    // Step 3: Pause and return
     int back = -1;
     while (back != 0) {
         printf("\nEnter 0 to return to main menu: ");
         scanf("%d", &back);
-        while (getchar() != '\n');  // Clear buffer
+        while (getchar() != '\n');
     }
 }
 
 
+void sortCurrentOrdersByDeliveryTime() {
+    for (int i = 0; i < orderCount - 1; i++) {
+        for (int j = 0; j < orderCount - i - 1; j++) {
+
+            time_t t1 = convertToTimestamp(orders[j].deliverytime);
+            time_t t2 = convertToTimestamp(orders[j+1].deliverytime);
+
+            if (t1 > t2) {
+                Order temp = orders[j];
+                orders[j] = orders[j+1];
+                orders[j+1] = temp;
+            }
+        }
+    }
+}
+
+
+void sortDeliveredItems(DeliveredItem *arr, int n) {
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+
+            time_t t1 = convertToTimestamp(arr[j].timeStr);
+            time_t t2 = convertToTimestamp(arr[j+1].timeStr);
+
+            // Delivered: latest FIRST
+            if (t1 < t2) {
+                DeliveredItem temp = arr[j];
+                arr[j] = arr[j+1];
+                arr[j+1] = temp;
+            }
+        }
+    }
+}

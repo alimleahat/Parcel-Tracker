@@ -150,3 +150,9 @@ void getTimeSinceDelivery(const char *deliveryStr, char *output) {
         sprintf(output, "%d days %d hours ago", days, hours);
     }
 }
+
+time_t convertToTimestamp(const char *deliveryStr) {
+    struct tm t = {0};
+    parseDeliveryTime(deliveryStr, &t);
+    return mktime(&t);
+}
