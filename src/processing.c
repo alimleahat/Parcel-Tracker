@@ -31,11 +31,6 @@ void loadDepots() {
     }
 
     fclose(f);
-    printf("Loaded %d depots.", depotCount);
-}
-
-void processOrder() {
-    printf("[processOrder Placeholder]");
 }
 
 const char* getCourierName(int id) {

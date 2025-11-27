@@ -96,7 +96,7 @@ void addOrder() {
         scanf("%d:%d", &hour, &minute);
         while (getchar() != '\n');
 
-        // ---- OPTIONAL VALIDATION ----
+
         if (day < 1 || day > 31 || month < 1 || month > 12 || year < 2025 ||
             hour < 0 || hour > 23 || minute < 0 || minute > 59) {
             printf("Invalid date or time. Please try again.\n");
@@ -138,11 +138,19 @@ void addOrder() {
 
 void currentOrders() {
 
+    sortCurrentOrdersByDeliveryTime();
+    #ifdef _WIN32
+    system("cls");
+     #else
+    system("clear");
+    #endif
+
+
     if (orderCount == 0) {
         printf("\nNo orders found.\n");
     } else {
 
-        printf("\n--- Current Orders ---\n");
+        printf("\n---------------------------- Current Orders ----------------------------\n\n");
 
         printf("%-10s %-15s %-8s %-20s %-8s %-12s\n",
                "ID", "Name", "Weight", "Time Left", "Cost", "Courier");
@@ -169,56 +177,6 @@ void currentOrders() {
         }
     }
 
-    saveOrders();
-
-    // ---------------------------------------------------------
-    // SORT OPTION AFTER THE LIST IS SHOWN
-    // ---------------------------------------------------------
-    int sortChoice;
-    printf("\nPress 1 to sort by nearest delivery time\n");
-    printf("Press 0 to return: ");
-
-    scanf("%d", &sortChoice);
-    while (getchar() != '\n');
-
-    if (sortChoice == 1) {
-
-        sortCurrentOrdersByDeliveryTime();
-
-        system("clear"); // or "cls" on Windows
-
-        printf("\n--- Current Orders (Sorted by Delivery Time) ---\n");
-
-        printf("%-10s %-15s %-8s %-20s %-8s %-12s\n",
-               "ID", "Name", "Weight", "Time Left", "Cost", "Courier");
-
-        for (int i = 0; i < orderCount; i++) {
-
-            char timeLeft[50];
-            int dummy;
-
-            getTimeRemaining(orders[i].deliverytime, timeLeft, &dummy);
-
-            printf("%-10d %-15s %-8.2f %-20s %-8.2f %-12s\n",
-                   orders[i].packageID,
-                   orders[i].name,
-                   orders[i].weight,
-                   timeLeft,
-                   orders[i].cost,
-                   getCourierName(orders[i].courier));
-        }
-
-        // final pause
-        int back = -1;
-        while (back != 0) {
-            printf("\nEnter 0 to return to the main menu: ");
-            scanf("%d", &back);
-            while (getchar() != '\n');
-        }
-
-        return;
-    }
-
     // normal return
     int back = -1;
     while (back != 0) {
@@ -229,6 +187,13 @@ void currentOrders() {
 }
 
 void searchOrder() {
+
+    #ifdef _WIN32
+    system("cls");
+     #else
+    system("clear");
+    #endif
+    
     int id;
     printf("Enter Package ID to search: ");
     scanf("%d", &id);
@@ -256,7 +221,7 @@ void searchOrder() {
                 saveOrders();
             }
 
-            printf("\n--- Order Found ---\n");
+            printf("\n--------------------------------- Order Found ---------------------------------\n\n");
             printf("%-10s %-15s %-8s %-25s %-8s %-12s\n",
                    "ID", "Name", "Weight", "Time Left",
                    "Cost", "Courier");
@@ -295,7 +260,7 @@ void searchOrder() {
                 char ago[50];
                 getTimeSinceDelivery(timeStr, ago);
 
-                printf("\n--- Order Found ---\n");
+                printf("\n--------------------------------- Order Found ---------------------------------\n\n");
                 printf("%-10s %-15s %-8s %-25s %-8s %-12s\n",
                        "ID", "Name", "Weight", "Delivered",
                        "Cost", "Courier");
@@ -371,7 +336,13 @@ void syncDeliveredOrders() {
 
 void deliveredOrders() {
 
+    #ifdef _WIN32
+    system("cls");
+     #else
+    system("clear");
+    #endif
     syncDeliveredOrders();
+    
 
     FILE *f = fopen("data/history.txt", "r");
     if (!f) {
@@ -401,7 +372,7 @@ void deliveredOrders() {
         }
         fclose(f);
 
-        printf("\n--- Delivered Orders ---\n");
+        printf("\n------------------------------ Delivered Orders ------------------------------\n\n");
 
         printf("%-10s %-15s %-8s %-25s %-8s %-12s\n",
                "ID", "Name", "Weight", "Delivered", "Cost", "Courier");
@@ -419,50 +390,55 @@ void deliveredOrders() {
                    getCourierName(arr[i].courier));
         }
 
-        // ---------------------------------------------------------
-        // SORT OPTION AFTER THE LIST IS SHOWN
-        // ---------------------------------------------------------
-        int sortChoice;
-        printf("\nPress 1 to sort by most recent delivery\n");
-        printf("Press 0 to return: ");
+    int sortChoice;
+    printf("\nEnter 1 to sort by most recent delivery\n");
+    printf("Enter 0 to return to main menu: ");
 
-        scanf("%d", &sortChoice);
-        while (getchar() != '\n');
+    scanf("%d", &sortChoice);
+    while (getchar() != '\n');
 
-        if (sortChoice == 1) {
+    if (sortChoice == 0) {
+        // 🔥 FIX: Exit immediately without asking again
+        return;
+    }
 
-            sortDeliveredItems(arr, count);
+    if (sortChoice == 1) {
 
+        sortDeliveredItems(arr, count);
+
+        #ifdef _WIN32
+            system("cls");
+        #else
             system("clear");
+        #endif
 
-            printf("\n--- Delivered Orders (Sorted Latest First) ---\n");
+        printf("\n------------------- Delivered Orders (Sorted Latest First) -------------------\n\n");
+        printf("%-10s %-15s %-8s %-25s %-8s %-12s\n",
+            "ID", "Name", "Weight", "Delivered", "Cost", "Courier");
 
-            printf("%-10s %-15s %-8s %-25s %-8s %-12s\n",
-                   "ID", "Name", "Weight", "Delivered", "Cost", "Courier");
+        for (int i = 0; i < count; i++) {
+            char ago[50];
+            getTimeSinceDelivery(arr[i].timeStr, ago);
 
-            for (int i = 0; i < count; i++) {
-                char ago[50];
-                getTimeSinceDelivery(arr[i].timeStr, ago);
-
-                printf("%-10d %-15s %-8.2f %-25s %-8.2f %-12s\n",
-                       arr[i].id,
-                       arr[i].name,
-                       arr[i].weight,
-                       ago,
-                       arr[i].cost,
-                       getCourierName(arr[i].courier));
-            }
+            printf("%-10d %-15s %-8.2f %-25s %-8.2f %-12s\n",
+                arr[i].id,
+                arr[i].name,
+                arr[i].weight,
+                ago,
+                arr[i].cost,
+                getCourierName(arr[i].courier));
         }
     }
 
+    // 🔥 Now this exit loop only runs AFTER sorting
     int back = -1;
     while (back != 0) {
         printf("\nEnter 0 to return to main menu: ");
         scanf("%d", &back);
         while (getchar() != '\n');
+        }
     }
 }
-
 
 void sortCurrentOrdersByDeliveryTime() {
     for (int i = 0; i < orderCount - 1; i++) {
@@ -503,11 +479,24 @@ void statisticsMenu() {
     int choice = -1;
 
     while (choice != 0) {
-        printf("\n--- Statistics Menu ---\n");
-        printf("1. Basic Statistics\n");
-        printf("2. Orders Per Courier (ASCII Bar Chart)\n");
-        printf("0. Back\n");
-        printf("Enter choice: ");
+        #ifdef _WIN32
+        system("cls");
+        #else
+        system("clear");
+        #endif
+
+        printf("\n");
+        printf("──────────────────────────────────────────\n");
+        printf("            📊 STATISTICS MENU          \n");
+        printf("──────────────────────────────────────────\n\n");
+
+        printf("   1) 📈 View Statistics\n");
+        printf("   2) 📦 Orders Per Courier (Bar Chart)\n");
+        printf("   0) Back\n\n");
+
+        printf("──────────────────────────────────────────\n");
+        printf("👉 Enter choice: ");
+
         scanf("%d", &choice);
         while (getchar() != '\n');
 
@@ -550,17 +539,28 @@ void showBasicStats() {
         }
         fclose(f);
     }
+    #ifdef _WIN32
+    system("cls");
+     #else
+    system("clear");
+    #endif
 
-    printf("\n--- Basic Statistics ---\n");
-    printf("Active Orders: %d\n", activeCount);
-    printf("Delivered Orders: %d\n", deliveredCount);
-    printf("Total Orders: %d\n", activeCount + deliveredCount);
-    printf("Total Cost (Active): £%.2f\n", totalActiveCost);
-    printf("Total Cost (Delivered): £%.2f\n", totalDeliveredCost);
-    printf("Average Weight (All Orders): %.2f kg\n",
-           (activeCount + deliveredCount > 0)
-           ? totalWeight / (activeCount + deliveredCount)
-           : 0);
+    printf("\n");
+    printf("──────────────────────────────────────────────\n");
+    printf("             📊  STATISTICS\n");
+    printf("──────────────────────────────────────────────\n\n");
+
+    printf("   📦 Active Orders:              %d\n", activeCount);
+    printf("   ✔️  Delivered Orders:           %d\n", deliveredCount);
+    printf("   🧾 Total Orders:               %d\n", activeCount + deliveredCount);
+    printf("   💷 Total Cost (Active):        £%.2f\n", totalActiveCost);
+    printf("   💰 Total Cost (Delivered):     £%.2f\n", totalDeliveredCost);
+    printf("   ⚖️  Avg Order Weight:           %.2f kg\n",
+        (activeCount + deliveredCount > 0)
+        ? totalWeight / (activeCount + deliveredCount)
+        : 0);
+
+    printf("\n──────────────────────────────────────────────\n\n");
 
     int back = -1;
     while (back != 0) {
@@ -594,24 +594,34 @@ void showCourierBarChart() {
         fclose(f);
     }
 
-    printf("\n--- Orders Per Courier (ASCII Chart) ---\n");
+    #ifdef _WIN32
+        system("cls");
+        #else
+        system("clear");
+        #endif
+
+    printf("\n");
+    printf("──────────────────────────────────────────────\n");
+    printf("        📦 ORDERS PER COURIER (BAR CHART)\n");
+    printf("──────────────────────────────────────────────\n\n");
 
     for (int c = 1; c <= 5; c++) {
-
-        printf("%-12s | ", getCourierName(c));
-
-        // Print bar
+        printf("   %-15s │ ", getCourierName(c));   // aligned label
+        
+        // Print bar graph
         for (int i = 0; i < courierCount[c]; i++) {
             printf("█");
         }
 
-        printf(" (%d)\n", courierCount[c]);
+        printf(" (%d)\n", courierCount[c]);  // numeric count at end
     }
+
+    printf("\n──────────────────────────────────────────────\n");
 
     int back = -1;
     while (back != 0) {
-        printf("\nEnter 0 to go back: ");
+        printf("Enter 0 to return: ");
         scanf("%d", &back);
-        while (getchar() != '\n');
+        while (getchar() != '\n');  // flush
     }
 }

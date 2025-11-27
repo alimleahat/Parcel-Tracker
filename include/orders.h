@@ -1,6 +1,7 @@
 #ifndef ORDERS_H
 #define ORDERS_H
 
+extern int orderCount;
 void loadOrders();
 void saveOrders();
 void addOrder();
