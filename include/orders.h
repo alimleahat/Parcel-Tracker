@@ -14,18 +14,24 @@ typedef struct {
     int status;
 } DeliveredItem;
 
-
+// Order Storage
 void loadOrders();
 void saveOrders();
+void saveDelivered();
+
+// Menu Functions
 void addOrder();
+void currentOrders();
 void searchOrder();
 void deliveredOrders();
-void currentOrders();
+void statisticsMenu();
+
+//Sync and Sorting Functions
 void syncDeliveredOrders();
-void saveDelivered();
 void sortCurrentOrdersByDeliveryTime();
 void sortDeliveredItems(DeliveredItem *arr, int n);
-void statisticsMenu();
+
+// Statistics Functions
 void showBasicStats();
 void showCourierBarChart();
 
