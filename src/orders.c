@@ -8,6 +8,7 @@
 Order orders[100];
 int orderCount = 0;
 
+// Loads order data from file
 void loadOrders() {
     FILE *f = fopen("data/orders.txt", "r");
     if (!f) {
@@ -34,6 +35,7 @@ void loadOrders() {
     fclose(f);
 }
 
+// Saves order back to file on add and closing (called in main.c)
 void saveOrders() {
     FILE *f = fopen("data/orders.txt", "w");
     if (!f) {
@@ -58,24 +60,25 @@ void saveOrders() {
     fclose(f);
 }
 
-
+// Add order function which inputs prompts and adds order to an in-memory list
 void addOrder() {
     int again = 1;
 
     while (again) {
         Order o;
-
+        // Name
         printf("Enter package name: ");
         scanf("%49s", o.name);
         while (getchar() != '\n');
 
+        // ID
         printf("Enter package ID: ");
         scanf("%d", &o.packageID);
         while (getchar() != '\n');
 
-            // ---- DELIVERY DATE ----
+            // Delivery Date & Time
         int day, month, year, hour, minute;
-
+    
         printf("Enter delivery date (DD/MM/YYYY): ");
         scanf("%d/%d/%d", &day, &month, &year);
         while (getchar() != '\n');
@@ -91,19 +94,20 @@ void addOrder() {
             continue;   // restarts add-order loop
         }
 
-        // ---- INTERNAL STORAGE FORMAT ----
         sprintf(o.deliverytime, "%04d-%02d-%02d_%02d:%02d",
                 year, month, day, hour, minute);
-
+        
+        // Weight        
         o.weight = getIntInRange("Enter weight (kg): ", 0, 999);
         while (getchar() != '\n');
-
+        
+        // Courier ID
         o.courier = getIntInRange("1.FadEx\n2.USP\n3.DLH\n4.Royal Mile\n5.PDP\nSelect courier (1-5): ", 1, 5);
         while (getchar() != '\n');
 
         o.status = 0;
         o.cost = calculateCost(o.weight, o.courier);
-        printf("\nCalculated Cost: £%.2f\n", o.cost);
+        printf("\nCalculated Cost: £%.2f\n", o.cost); // Cost Output
 
         orders[orderCount++] = o;
 
@@ -117,11 +121,12 @@ void addOrder() {
         while (getchar() != '\n');
 
         if (again != 1) {
-                again = 0; // exit loop
+                again = 0;
         }
     }
 }
 
+// View Current Orders (Sub Menu) sorted by delivery time
 void currentOrders() {
 
     sortCurrentOrdersByDeliveryTime();
@@ -168,6 +173,7 @@ void currentOrders() {
     return;
 }
 
+// Search Order (Delivered or Not) by Package ID
 void searchOrder() {
 
     #ifdef _WIN32
@@ -183,9 +189,8 @@ void searchOrder() {
 
     int found = 0;
 
-    // ------------------------------------
-    // 1. Search ACTIVE orders (in memory)
-    // ------------------------------------
+    // 1. Search Current orders (in temporarily in memory)
+
     for (int i = 0; i < orderCount; i++) {
         if (orders[i].packageID == id) {
 
@@ -221,9 +226,7 @@ void searchOrder() {
     }
 
 
-    // ------------------------------------
-    // 2. Search DELIVERED orders (history)
-    // ------------------------------------
+    // 2. Search DELIVERED orders (history file)
     FILE *f = fopen("data/history.txt", "r");
     if (f) {
         int id2, courier, status;
@@ -273,9 +276,10 @@ endSearch:
     return;
 }
 
+// Sync delivered orders to history file and remove from active list when delivery time has passed and status turns to 1
 void syncDeliveredOrders() {
 
-    // Append delivered orders to delivered.txt
+   
     FILE *f = fopen("data/history.txt", "a");
     if (!f) {
         printf("Error opening delivered file.\n");
@@ -285,7 +289,7 @@ void syncDeliveredOrders() {
     for (int i = 0; i < orderCount; i++) {
         if (orders[i].status == 1) {
 
-            // Write to delivered.txt
+            
             fprintf(f, "%d %s %.2f %s %d %.2f %d\n",
                 orders[i].packageID,
                 orders[i].name,
@@ -300,7 +304,6 @@ void syncDeliveredOrders() {
 
     fclose(f);
 
-    // Remove delivered orders from active list
     int j = 0;
     for (int i = 0; i < orderCount; i++) {
         if (orders[i].status == 0) {
@@ -312,6 +315,7 @@ void syncDeliveredOrders() {
     saveOrders(); // rewrite orders.txt with only active orders
 }
 
+// Show Delivered Orders from history file with calculated time since delivery with the option to sort by delivery time (latest first)
 void deliveredOrders() {
 
     #ifdef _WIN32
@@ -334,7 +338,6 @@ void deliveredOrders() {
         char name[50], timeStr[20];
         float weight, cost;
 
-        // load delivered items
         while (fscanf(f, "%d %49s %f %19s %d %f %d",
                       &id, name, &weight, timeStr,
                       &status, &cost, &courier) == 7)
@@ -409,6 +412,7 @@ void deliveredOrders() {
     }
 }
 
+// Sorts Current Orders by Delivery Time (earliest first), used in currentOrders()
 void sortCurrentOrdersByDeliveryTime() {
     for (int i = 0; i < orderCount - 1; i++) {
         for (int j = 0; j < orderCount - i - 1; j++) {
@@ -425,7 +429,7 @@ void sortCurrentOrdersByDeliveryTime() {
     }
 }
 
-
+// Sorts Delivered Items by Delivery Time (latest first), used in deliveredOrders()
 void sortDeliveredItems(DeliveredItem *arr, int n) {
     for (int i = 0; i < n - 1; i++) {
         for (int j = 0; j < n - i - 1; j++) {
@@ -433,7 +437,6 @@ void sortDeliveredItems(DeliveredItem *arr, int n) {
             time_t t1 = convertToTimestamp(arr[j].timeStr);
             time_t t2 = convertToTimestamp(arr[j+1].timeStr);
 
-            // Delivered: latest FIRST
             if (t1 < t2) {
                 DeliveredItem temp = arr[j];
                 arr[j] = arr[j+1];
@@ -443,6 +446,7 @@ void sortDeliveredItems(DeliveredItem *arr, int n) {
     }
 }
 
+// Show Statistics Menu
 void statisticsMenu() {
 
     int choice = -1;
@@ -475,6 +479,7 @@ void statisticsMenu() {
     }
 }
 
+// Shows & Calculates Statistics Required
 void showBasicStats() {
 
     int activeCount = orderCount;
@@ -483,13 +488,13 @@ void showBasicStats() {
     float totalDeliveredCost = 0;
     float totalWeight = 0;
 
-    // Count active
+    // Count active orders
     for (int i = 0; i < orderCount; i++) {
         totalActiveCost += orders[i].cost;
         totalWeight += orders[i].weight;
     }
 
-    // Count delivered
+    // Count delivered orders
     FILE *f = fopen("data/history.txt", "r");
     if (f) {
         int id, courier, status;
@@ -532,6 +537,8 @@ void showBasicStats() {
     getIntInRange("\nEnter 0 to return: ", 0, 0);
     return;
 }
+
+// Shows Bar Chart of Orders per Courier
 void showCourierBarChart() {
 
     int courierCount[6] = {0};
@@ -569,14 +576,14 @@ void showCourierBarChart() {
     printf("──────────────────────────────────────────────\n\n");
 
     for (int c = 1; c <= 5; c++) {
-        printf("   %-15s │ ", getCourierName(c));   // aligned label
+        printf("   %-15s │ ", getCourierName(c));
         
         // Print bar graph
         for (int i = 0; i < courierCount[c]; i++) {
             printf("█");
         }
 
-        printf(" (%d)\n", courierCount[c]);  // numeric count at end
+        printf(" (%d)\n", courierCount[c]);
     }
 
     printf("\n──────────────────────────────────────────────\n");

@@ -3,6 +3,7 @@
 #include "orders.h"
 #include "processing.h"
 
+// Runs & Calls the Main Functions of the product such as Loading and Main Menu Choices.
 int main() {
     loadDepots();
     loadOrders();

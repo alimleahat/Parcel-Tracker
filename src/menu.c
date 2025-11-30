@@ -4,6 +4,8 @@
 #include "processing.h"
 #include "orders.h"
 
+// Displays the Main Menu with Current Timestamp and Active Order Count
+
 void showMenu() {
 
     #ifdef _WIN32

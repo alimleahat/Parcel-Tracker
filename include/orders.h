@@ -4,6 +4,7 @@
 
 extern int orderCount;
 
+// Delivered orders Data Structure, with delivery time as string
 typedef struct {
     int id;
     char name[50];

@@ -8,6 +8,8 @@
 DeliveryService depots[20];
 int depotCount = 0;
 
+// Loads depot data from file
+
 void loadDepots() {
     FILE *f = fopen("data/depots.txt", "r");
     if (!f) {
@@ -33,14 +35,14 @@ void loadDepots() {
     fclose(f);
 }
 
+// Converts Courier ID to it's restpective name
 const char* getCourierName(int id) {
     for (int i = 0; i < depotCount; i++) {
         if (depots[i].depotID == id)
             return depots[i].name;
     }
     return "Unknown";
-}
-
+}// Simple Delivery Cost Calculation Based on Rates, Distance and Weight of the product
 float calculateCost(float weight, int courierID) {
     for (int i = 0; i < depotCount; i++) {
         if (depots[i].depotID == courierID) {
@@ -56,6 +58,7 @@ float calculateCost(float weight, int courierID) {
     return 0.0f;  // fallback
 }
 
+// Gets Current System Time and converts to struct to compare with delivery time
 char* getCurrentTimestamp() {
     static char buffer[40];   // increased size
 
@@ -73,8 +76,10 @@ char* getCurrentTimestamp() {
     return buffer;
 }
 
+// Convert Delivery time to struct tm
+
 void parseDeliveryTime(const char *deliveryStr, struct tm *t) {
-    // Example format: 2025-11-28_14:30
+    // Format: YYYY-MM-DD_HH:MM
     sscanf(deliveryStr, "%d-%d-%d_%d:%d",
            &t->tm_year,
            &t->tm_mon,
@@ -82,12 +87,13 @@ void parseDeliveryTime(const char *deliveryStr, struct tm *t) {
            &t->tm_hour,
            &t->tm_min);
 
-    t->tm_year -= 1900;   // tm_year is years since 1900
-    t->tm_mon -= 1;       // tm_mon is 0–11
+    t->tm_year -= 1900;   
+    t->tm_mon -= 1;       
     t->tm_sec = 0;
-    t->tm_isdst = -1;     // let system determine
+    t->tm_isdst = -1;     
 }
 
+// Compares System time with delivery time to get a remaining time string and status (Delivered or Not)
 void getTimeRemaining(const char *deliveryStr, char *output, int *status) {
     time_t now = time(NULL);
     struct tm delivery = {0};
@@ -119,6 +125,7 @@ void getTimeRemaining(const char *deliveryStr, char *output, int *status) {
     *status = 0;
 }
 
+// Calculates time since delivery for delivered orders
 void getTimeSinceDelivery(const char *deliveryStr, char *output) {
     time_t now = time(NULL);
     struct tm delivery = {0};
@@ -129,8 +136,7 @@ void getTimeSinceDelivery(const char *deliveryStr, char *output) {
 
     double diff = difftime(now, deliveryTime);
 
-    if (diff < 0) {
-        // delivery time in the future (should never happen here)
+    if (diff < 0) { // Safety check
         strcpy(output, "Not delivered");
         return;
     }
@@ -147,12 +153,14 @@ void getTimeSinceDelivery(const char *deliveryStr, char *output) {
     }
 }
 
+// 
 time_t convertToTimestamp(const char *deliveryStr) {
     struct tm t = {0};
     parseDeliveryTime(deliveryStr, &t);
     return mktime(&t);
 }
 
+// Used in multiple places to validate integer inputs within a specified range 
 int getIntInRange(const char *prompt, int min, int max) {
     int value;
     int valid = 0;
@@ -162,7 +170,7 @@ int getIntInRange(const char *prompt, int min, int max) {
 
         if (scanf("%d", &value) == 1) {
             if (value >= min && value <= max) {
-                valid = 1;   // VALID input
+                valid = 1;
             } else {
                 printf("Input must be between %d and %d.\n", min, max);
             }
@@ -170,7 +178,7 @@ int getIntInRange(const char *prompt, int min, int max) {
             printf("Invalid input. Please enter a number.\n");
         }
 
-        while (getchar() != '\n'); // CLEAR buffer
+        while (getchar() != '\n'); 
     }
 
     return value;

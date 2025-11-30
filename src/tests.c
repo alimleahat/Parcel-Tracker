@@ -14,6 +14,7 @@
     if (((a) > (b) ? (a)-(b) : (b)-(a)) < tol) printf("[PASS] %s\n", msg); \
     else                                      printf("[FAIL] %s\n", msg);
 
+// Test Cost Calculation Function
 
 void test_costCalculation() {
 
@@ -28,7 +29,7 @@ void test_costCalculation() {
 
 }
 
-
+// Test Date Parsing Function
 void test_parseDeliveryTime() {
     printf("\nTest 2: Date Parsing\n");
 
@@ -42,7 +43,7 @@ void test_parseDeliveryTime() {
     ASSERT_TRUE(t.tm_min == 30, "Minute parsed correctly");
 }
 
-
+// Test Time Remaining Function
 void test_timeRemaining() {
     printf("\nTest 3: Time Remaining\n");
 
@@ -55,7 +56,7 @@ void test_timeRemaining() {
 }
 
 
-
+// Test Time Since Delivery Function
 void test_timeSinceDelivery() {
     printf("\nTest 4: Time Since Delivery\n");
 
