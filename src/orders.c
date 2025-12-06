@@ -1,3 +1,8 @@
+/*
+ * orders.c
+ * Maintains the active order list, handles persistence to disk, and provides
+ * helpers for displaying, searching, and reporting on order data.
+ */
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -5,6 +10,7 @@
 #include "common.h"
 #include "processing.h"
 
+// In-memory representation of current orders plus the number of active slots.
 Order orders[100];
 int orderCount = 0;
 
@@ -60,7 +66,7 @@ void saveOrders() {
     fclose(f);
 }
 
-// Add order function which inputs prompts and adds order to an in-memory list
+// Prompts the user for each field and appends a validated order to memory.
 void addOrder() {
     int again = 1;
 
@@ -99,11 +105,9 @@ void addOrder() {
         
         // Weight        
         o.weight = getIntInRange("Enter weight (kg): ", 0, 999);
-        while (getchar() != '\n');
         
         // Courier ID
         o.courier = getIntInRange("1.FadEx\n2.USP\n3.DLH\n4.Royal Mile\n5.PDP\nSelect courier (1-5): ", 1, 5);
-        while (getchar() != '\n');
 
         o.status = 0;
         o.cost = calculateCost(o.weight, o.courier);
@@ -118,7 +122,6 @@ void addOrder() {
 
         
         again = getIntInRange("Enter choice: ", 0, 1);
-        while (getchar() != '\n');
 
         if (again != 1) {
                 again = 0;
@@ -126,7 +129,7 @@ void addOrder() {
     }
 }
 
-// View Current Orders (Sub Menu) sorted by delivery time
+// Shows a submenu of active orders sorted by time remaining.
 void currentOrders() {
 
     sortCurrentOrdersByDeliveryTime();
@@ -173,7 +176,7 @@ void currentOrders() {
     return;
 }
 
-// Search Order (Delivered or Not) by Package ID
+// Searches both active and historical orders for a matching package ID.
 void searchOrder() {
 
     #ifdef _WIN32
@@ -254,7 +257,7 @@ void searchOrder() {
                        id2,
                        name,
                        weight,
-                       ago,                    // ✔ New field
+                       ago,                 
                        cost,
                        getCourierName(courier));
 
@@ -276,7 +279,7 @@ endSearch:
     return;
 }
 
-// Sync delivered orders to history file and remove from active list when delivery time has passed and status turns to 1
+// Moves delivered items into history while keeping active memory clean.
 void syncDeliveredOrders() {
 
    
@@ -315,7 +318,7 @@ void syncDeliveredOrders() {
     saveOrders(); // rewrite orders.txt with only active orders
 }
 
-// Show Delivered Orders from history file with calculated time since delivery with the option to sort by delivery time (latest first)
+// Lists delivered orders and optionally sorts the list by the latest deliveries first.
 void deliveredOrders() {
 
     #ifdef _WIN32

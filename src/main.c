@@ -1,9 +1,14 @@
+/*
+ * main.c
+ * Entry point for the Parcel Tracker CLI. Loads persisted data and
+ * coordinates the top-level menu loop for the rest of the application.
+ */
 #include <stdio.h>
 #include "menu.h"
 #include "orders.h"
 #include "processing.h"
 
-// Runs & Calls the Main Functions of the product such as Loading and Main Menu Choices.
+// Infinite loop, loops until the user exits.
 int main() {
     loadDepots();
     loadOrders();

@@ -1,3 +1,8 @@
+/*
+ * processing.c
+ * Provides shared helpers for depot data, pricing calculations, and
+ * time-related utilities that power the rest of the tracker.
+ */
 #include <stdio.h>
 #include <string.h>
 #include "processing.h"
@@ -5,11 +10,11 @@
 #include <time.h>
 #include "orders.h"
 
+// Cached depot definitions loaded once at boot.
 DeliveryService depots[20];
 int depotCount = 0;
 
 // Loads depot data from file
-
 void loadDepots() {
     FILE *f = fopen("data/depots.txt", "r");
     if (!f) {
@@ -42,7 +47,9 @@ const char* getCourierName(int id) {
             return depots[i].name;
     }
     return "Unknown";
-}// Simple Delivery Cost Calculation Based on Rates, Distance and Weight of the product
+}
+
+// Simple Delivery Cost Calculation Based on Rates, Distance and Weight of the product
 float calculateCost(float weight, int courierID) {
     for (int i = 0; i < depotCount; i++) {
         if (depots[i].depotID == courierID) {
@@ -77,7 +84,6 @@ char* getCurrentTimestamp() {
 }
 
 // Convert Delivery time to struct tm
-
 void parseDeliveryTime(const char *deliveryStr, struct tm *t) {
     // Format: YYYY-MM-DD_HH:MM
     sscanf(deliveryStr, "%d-%d-%d_%d:%d",
@@ -153,7 +159,7 @@ void getTimeSinceDelivery(const char *deliveryStr, char *output) {
     }
 }
 
-// 
+// Converts the delivery string into a comparable timestamp.
 time_t convertToTimestamp(const char *deliveryStr) {
     struct tm t = {0};
     parseDeliveryTime(deliveryStr, &t);

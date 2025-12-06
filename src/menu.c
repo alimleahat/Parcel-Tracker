@@ -1,3 +1,8 @@
+/*
+ * menu.c
+ * Renders the text-based navigation menu and relies on shared helpers for
+ * timestamps and the global order count.
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include "menu.h"
@@ -5,7 +10,6 @@
 #include "orders.h"
 
 // Displays the Main Menu with Current Timestamp and Active Order Count
-
 void showMenu() {
 
     #ifdef _WIN32
@@ -30,4 +34,3 @@ void showMenu() {
     printf("Active Orders: %d \n", orderCount);
     printf("─────────────────────────────────────────────\n\n");
 }
-

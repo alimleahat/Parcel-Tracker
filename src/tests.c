@@ -1,3 +1,7 @@
+/*
+ * tests.c
+ * Lightweight console testing file for the shared processing helpers.
+ */
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
@@ -15,7 +19,6 @@
     else                                      printf("[FAIL] %s\n", msg);
 
 // Test Cost Calculation Function
-
 void test_costCalculation() {
 
     loadDepots();
